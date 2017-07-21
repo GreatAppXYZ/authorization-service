@@ -1,0 +1,71 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'org.flywaydb:flyway-gradle-plugin:4.2.0'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+group = 'xyz.greatapp.authorization-service'
+version = '0.0.1-SNAPSHOT'
+
+description = """authorization-service"""
+sourceCompatibility = 1.8
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+ext {
+    springCloudVersion = 'Dalston.SR1'
+}
+
+dependencies {
+    compile group: 'org.json', name: 'json', version:'20150729'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-oauth2', version:'1.2.1.RELEASE'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-security', version:'1.2.1.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.5.3.RELEASE'
+    compile 'org.springframework.cloud:spring-cloud-starter-eureka'
+    compile 'org.springframework.cloud:spring-cloud-starter-config'
+    compile 'xyz.my-app:libs:0.0.13'
+    testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'1.5.3.RELEASE') {
+       exclude(module: 'commons-logging')
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+
+task stage(type: Copy, dependsOn: [clean, build]) {
+    from jar.archivePath
+    into project.rootDir
+    rename {
+        'app.jar'
+    }
+}
+stage.mustRunAfter(clean)
+
+clean {
+    doLast {
+        project.file('app.jar').delete()
+    }
+}

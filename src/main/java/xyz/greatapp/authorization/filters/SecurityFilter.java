@@ -32,8 +32,10 @@ public class SecurityFilter extends GenericFilterBean
     {
         final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         final HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        if (isNotValidClientUrl(httpServletRequest.getServerName()))
+        if (isNotValidClientUrl(httpServletRequest.getHeader("origin")))
         {
+            System.out.println("Invalid Origin: " + httpServletRequest.getHeader("origin"));
+            System.out.println("Server Name: " + httpServletRequest.getServerName());
             ((HttpServletResponse) response).sendError(SC_FORBIDDEN, "Client not allowed: " + httpServletRequest.getServerName());
         }
         setCORSHeaders(httpServletResponse, httpServletRequest);

@@ -23,10 +23,14 @@ import org.springframework.web.filter.GenericFilterBean;
 public class SecurityFilter extends GenericFilterBean
 {
     private final List<String> WHITE_LIST_CLIENTS = asList(
-            "localhost",
-            "test.localhost",
-            "www.greatapp.xyz",
-            "uat.greatapp.xyz");
+            "http://localhost",
+            "https://localhost",
+            "http://test.localhost",
+            "https://test.localhost",
+            "http://www.greatapp.xyz",
+            "https://www.greatapp.xyz",
+            "http://uat.greatapp.xyz",
+            "https://uat.greatapp.xyz");
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
     {
@@ -35,7 +39,6 @@ public class SecurityFilter extends GenericFilterBean
         if (isNotValidClientUrl(httpServletRequest.getHeader("origin")))
         {
             System.out.println("Invalid Origin: " + httpServletRequest.getHeader("origin"));
-            System.out.println("Server Name: " + httpServletRequest.getServerName());
             ((HttpServletResponse) response).sendError(SC_FORBIDDEN, "Client not allowed: " + httpServletRequest.getServerName());
         }
         setCORSHeaders(httpServletResponse, httpServletRequest);

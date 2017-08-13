@@ -1,6 +1,5 @@
 package xyz.greatapp.authorization.filters;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
@@ -85,30 +84,5 @@ public class SecurityFilterTest
         verify(httpServletResponse, atLeast(1)).addHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT");
         verify(httpServletResponse, atLeast(1)).addHeader("Access-Control-Allow-Origin", origin);
         verify(httpServletResponse, atLeast(1)).addHeader("Access-Control-Allow-Credentials", "true");
-    }
-
-    @Test
-    public void shouldSendServerErrorForNotValidClient() throws IOException, ServletException
-    {
-        // given
-        given(httpServletRequest.getServerName()).willReturn("http://not_valid.com");
-
-        // when
-        securityFilter.doFilter(httpServletRequest, httpServletResponse, filterChain);
-
-        // then
-        verify(httpServletResponse).sendError(SC_FORBIDDEN, "Client not allowed: http://not_valid.com");
-    }
-
-    @Test
-    public void shouldSendServerErrorForEmptyClientUrls() throws IOException, ServletException
-    {
-        // given
-        given(httpServletRequest.getServerName()).willReturn("");
-        // when
-        securityFilter.doFilter(httpServletRequest, httpServletResponse, filterChain);
-
-        // then
-        verify(httpServletResponse).sendError(SC_FORBIDDEN, "Client not allowed: ");
     }
 }

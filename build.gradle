@@ -4,7 +4,6 @@ buildscript {
     }
     repositories {
         mavenCentral()
-        mavenLocal()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -42,7 +41,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.5.3.RELEASE'
     compile 'org.springframework.cloud:spring-cloud-starter-eureka'
     compile 'org.springframework.cloud:spring-cloud-starter-config'
-    compile 'xyz.my-app:libs:0.0.14'
+    compile 'xyz.greatapp:libs:0.0.20'
     testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version:'1.5.3.RELEASE') {
        exclude(module: 'commons-logging')
     }

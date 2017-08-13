@@ -3,7 +3,7 @@ package xyz.greatapp.authorization.filters;
 import static java.lang.Integer.MIN_VALUE;
 import static java.util.Arrays.asList;
 import static java.util.Objects.nonNull;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,10 +23,14 @@ import org.springframework.web.filter.GenericFilterBean;
 public class SecurityFilter extends GenericFilterBean
 {
     private final List<String> WHITE_LIST_CLIENTS = asList(
+            "http://localhost:8080",
             "http://localhost",
+            "https://localhost:8080",
             "https://localhost",
             "http://test.localhost",
             "https://test.localhost",
+            "http://test.localhost:8080",
+            "https://test.localhost:8080",
             "http://www.greatapp.xyz",
             "https://www.greatapp.xyz",
             "http://uat.greatapp.xyz",
@@ -36,14 +40,13 @@ public class SecurityFilter extends GenericFilterBean
     {
         final HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         final HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        if (isNotValidClientUrl(httpServletRequest.getHeader("origin")))
+        if (isValidClientUrl(getClientUrl(httpServletRequest)))
         {
-            System.out.println("Invalid Origin: " + httpServletRequest.getHeader("origin"));
-            ((HttpServletResponse) response).sendError(SC_FORBIDDEN, "Client not allowed: " + httpServletRequest.getServerName());
+            setCORSHeaders(httpServletResponse, httpServletRequest);
         }
-        setCORSHeaders(httpServletResponse, httpServletRequest);
-        if (!httpServletRequest.getMethod().equals("OPTIONS"))
-        {
+        if ("OPTIONS".equalsIgnoreCase(httpServletRequest.getMethod())) {
+            httpServletResponse.setStatus(SC_OK);
+        } else {
             chain.doFilter(request, response);
         }
     }
@@ -57,9 +60,9 @@ public class SecurityFilter extends GenericFilterBean
         if(response.getHeader("Access-Control-Allow-Credentials") == null) response.addHeader("Access-Control-Allow-Credentials", "true");
     }
 
-    private boolean isNotValidClientUrl(String serverName)
+    private boolean isValidClientUrl(String serverName)
     {
-        return WHITE_LIST_CLIENTS.indexOf(serverName) < 0;
+        return WHITE_LIST_CLIENTS.contains(serverName);
     }
 
     private String getClientUrl(HttpServletRequest request)
